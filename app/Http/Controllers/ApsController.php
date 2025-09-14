@@ -53,7 +53,7 @@ class ApsController extends Controller
     ]);
 
 
-        return redirect()->route('accueil');
+        return redirect()->route('aps.dashboard');
     }
 
     // Afficher un APS

@@ -86,3 +86,34 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
     Route::post('/profil/update-password', [ProfilController::class, 'updatePassword'])->name('profil.update_password');
 
 });
+
+// route du  Dashboard aps
+Route::middleware(['role:aps'])->prefix('aps')->name('aps.')->group(function () {
+
+    Route::get('/dashbord', function () {
+        return view('aps.dashboard');
+    })->name('dashboard');
+
+    Route::get('/message', function () {
+        return view('aps.messages');
+    })->name('messages');
+
+    Route::get('/patients', function () {
+        return view('aps.patients');
+    })->name('patients');
+
+    Route::get('/traitements', function () {
+        return view('aps.traitements');
+    })->name('traitements');
+
+    Route::get('/profil', function () {
+        return view('aps.profil');
+    })->name('profil');
+
+    Route::get('/rendez_vous', function () {
+        return view('aps.rendez_vous');
+    })->name('rendez_vous');
+    
+
+});
+
