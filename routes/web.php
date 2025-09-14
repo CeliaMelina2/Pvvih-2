@@ -7,6 +7,15 @@ use App\Http\Controllers\PatientDashboardController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ApsController;
 
+
+use App\Http\Controllers\Patient\DashboardController;
+use App\Http\Controllers\Patient\RendezVousController;
+use App\Http\Controllers\Patient\TraitementController;
+use App\Http\Controllers\Patient\DossierMedicalController;
+use App\Http\Controllers\Patient\MessagesController;
+use App\Http\Controllers\Patient\ProfilController;
+
+
 // Page d’accueil
 Route::get('/', [AuthController::class, 'accueil'])->name('accueil');
 
@@ -18,8 +27,8 @@ Route::get('/inscription', function () {
 // ===================== INSCRIPTION =====================
 
 // Inscription Patient
-Route::get('/inscription/patient', [RegisterController::class, 'showPatientForm'])->name('inscription.patient');
-Route::post('/inscription/patient', [RegisterController::class, 'registerPatient']);
+Route::get('/inscription/patient', [RegisterController::class, 'showPatientForm'])->name('affiche.inscription.patient');
+Route::post('/inscription/patient', [RegisterController::class, 'registerPatient'])->name('inscription.patient');
 
 // Inscription APS
 Route::get('/inscription/aps', [ApsController::class, 'create'])->name('inscription.aps');
@@ -37,9 +46,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ===================== DASHBOARD =====================
 
-// Dashboard Patient (seulement pour utilisateurs connectés)
-Route::get('/patient/dashboard', [PatientDashboardController::class, 'index'])
-    ->name('patient.dashboard');
 // ===================== REDIRECTION LARAVEL PAR DÉFAUT =====================
 Route::get('/login', function () {
     return redirect()->route('connexion');
@@ -48,3 +54,35 @@ Route::get('/login', function () {
 // ===================== CRUD =====================
 // Route::resource('patients', PatientController::class);
 // Route::resource('aps', ApsController::class);
+
+
+// route du  Dashboard patient
+Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(function () {
+
+
+      // Tableau de bord
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Rendez-vous
+    Route::get('/rendezvous', [RendezVousController::class, 'index'])->name('rendezvous');
+    Route::post('/rendezvous/prendre', [RendezVousController::class, 'store'])->name('rendezvous.store');
+    Route::post('/rendezvous/annuler/{id}', [RendezVousController::class, 'cancel'])->name('rendezvous.cancel');
+
+    // Traitements
+    Route::get('/traitements', [TraitementController::class, 'index'])->name('traitement');
+    Route::post('/traitements/marquer-pris/{id}', [TraitementController::class, 'marquerPris'])->name('traitements.marquer_pris');
+
+    // Dossier médical
+    Route::get('/dossier-medical', [DossierMedicalController::class, 'index'])->name('dossier_medical');
+
+    // Messages
+    Route::get('/messages', [MessagesController::class, 'index'])->name('message');
+    Route::post('/messages/envoyer', [MessagesController::class, 'store'])->name('messages.store');
+
+    // Profil
+    Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+    Route::post('/profil/update-info', [ProfilController::class, 'updateInfo'])->name('profil.update_info');
+    Route::post('/profil/update-sante', [ProfilController::class, 'updateSante'])->name('profil.update_sante');
+    Route::post('/profil/update-password', [ProfilController::class, 'updatePassword'])->name('profil.update_password');
+
+});

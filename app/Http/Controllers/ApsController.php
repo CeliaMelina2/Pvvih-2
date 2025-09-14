@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aps;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -43,7 +44,16 @@ class ApsController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json($aps, 201);
+     $user = User::create([
+        'name' => $request->nom,          // correspond à la colonne "name"
+        'prenom' => $request->prenom,     // ajouter "prenom" dans $fillable
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => 'aps',
+    ]);
+
+
+        return redirect()->route('accueil');
     }
 
     // Afficher un APS

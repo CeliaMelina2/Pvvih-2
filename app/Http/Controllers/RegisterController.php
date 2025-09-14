@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-
 
 class RegisterController extends Controller
 {
-    // Formulaire patient
+    // Formulaire d'inscription patient
     public function showPatientForm()
     {
         return view('inscription_patient');
@@ -20,54 +19,99 @@ class RegisterController extends Controller
     // Enregistrement patient
     public function registerPatient(Request $request)
     {
-        $request->validate([
+        // Validation
+        $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|confirmed|min:8',
-            'sexe' => 'required|string',
+              'sexe' => 'required|string', // ✅ ajouté
             'telephone' => 'required|string|max:20',
             'adresse' => 'required|string|max:255',
             'statut_serologique' => 'required|string',
             'date_diagnostic' => 'required|date',
             'codeTARV' => 'required|string|max:50',
+            'attestation' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
+        // Gestion du fichier attestation
+        $attestation = null;
+        if ($request->hasFile('attestation')) {
+            $file = $request->file('attestation');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/attestations', $filename);
+            $attestation = $filename;
+        }
+
+            // Création de l'utilisateur
         $user = User::create([
-            'name' => $request->nom . ' ' . $request->prenom,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'patient',
         ]);
 
+        // S'assurer que l'utilisateur a bien été créé avant de créer le patient
+        if ($user) {
+            $patient = Patient::create([
+                'nom' => $validated['nom'],
+                'prenom' => $validated['prenom'],
+                'telephone' => $validated['telephone'],
+                'adresse' => $validated['adresse'],
+                'sexe' => $validated['sexe'], // ✅ ajouté
+                'statut_serologique' => $validated['statut_serologique'],
+                'date_diagnostic' => $validated['date_diagnostic'],
+                'codeTARV' => $validated['codeTARV'],
+                'attestation' => $attestation ?? null,
+                'user_id' => $user->id, // clé étrangère obligatoire
+            ]);
+        }
 
 
-    // ✅ Connexion automatique
-    Auth::login($user);
+        // Connexion automatique
+        Auth::login($user);
 
-    // ✅ Redirection directe vers le dashboard
-    return redirect()->route('patient.dashboard')
-        ->with('success', 'Bienvenue ' . $user->name . ' ! Vous êtes connecté.');
+        return redirect()->route('patient.dashboard')
+            ->with('success', 'Bienvenue ' . $user->name . ' ! Vous êtes connecté.');
     }
-        public function showLoginForm()
+
+    // Formulaire de connexion
+    public function showLoginForm()
     {
         return view('connexion');
     }
-   public function login(Request $request)
+
+    // Login général (sans guard)
+    public function login(Request $request)
     {
-        // ✅ validation simple (pas de unique ici)
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // ✅ on récupère l’utilisateur
             $user = Auth::user();
-
-            return redirect()->route('patient.dashboard')
-                ->with('success', 'Bienvenue ' . $user->name . ' ! Vous êtes connecté.');
+         
+            // Vérification du rôle
+            if ($user->role === 'patient') {
+                return redirect()->route('patient.dashboard')
+                    ->with('success', 'Bienvenue ' . $user->name . ' !');
+            } elseif ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Bienvenue ' . $user->name . ' !');
+            } elseif ($user->role === 'aps') {
+                return redirect()->route('aps.dashboard')
+                    ->with('success', 'Bienvenue ' . $user->name . ' !');
+            } else {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Rôle inconnu. Contactez l’administrateur.',
+                ]);
+            }
         }
 
         return back()->withErrors([
@@ -75,5 +119,13 @@ class RegisterController extends Controller
         ]);
     }
 
+    // Déconnexion
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
+        return redirect()->route('connexion');
+    }
 }

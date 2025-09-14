@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::create('patients', function (Blueprint $table) {
+   Schema::create('patients', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
         $table->string('nom');
         $table->string('prenom');
-        $table->string('email')->unique();
-        $table->string('password');
         $table->string('sexe');
         $table->string('telephone');
         $table->string('adresse');
         $table->string('statut_serologique');
         $table->date('date_diagnostic');
         $table->string('codeTARV');
+        $table->string('attestation')->nullable(); // si tu stockes un fichier
         $table->timestamps();
     });
+
 
 }
 

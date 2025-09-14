@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Patient;
+use App\Models\User;
+
 
 class PatientAuthController extends Controller
 {
@@ -30,7 +32,7 @@ class PatientAuthController extends Controller
             'codeTARV' => 'required|string|max:50',
         ]);
 
-        Patient::create([
+        $patient = Patient::create([
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'email' => $request->email,
@@ -41,6 +43,14 @@ class PatientAuthController extends Controller
             'statut_serologique' => $request->statut_serologique,
             'date_diagnostic' => $request->date_diagnostic,
             'codeTARV' => $request->codeTARV,
+        ]);
+
+        $user = User::create([
+            'name' => $request->nom,          // correspond à la colonne "name"
+            'prenom' => $request->prenom,     // ajouter "prenom" dans $fillable
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'aps',
         ]);
 
         return redirect()->route('connexion')

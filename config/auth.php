@@ -35,12 +35,6 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -58,18 +52,45 @@ return [
     | Supported: "database", "eloquent"
     |
     */
+        'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
+    'patient' => [
+        'driver' => 'session',
+        'provider' => 'patients',
+    ],
+
+    'aps' => [
+        'driver' => 'session',
+        'provider' => 'aps',
+    ],
+],
+
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+
+    'patients' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Patient::class,
+    ],
+
+    'aps' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Aps::class,
+    ],
+],
+
 
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -112,18 +133,6 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'patients',
-        ],
-    ],
-    'providers' => [
-        'patients' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Patient::class,
-        ],
-    ],
 
 ];
 
