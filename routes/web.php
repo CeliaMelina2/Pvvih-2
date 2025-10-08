@@ -14,6 +14,7 @@ use App\Http\Controllers\Patient\TraitementController;
 use App\Http\Controllers\Patient\DossierMedicalController;
 use App\Http\Controllers\Patient\MessagesController;
 use App\Http\Controllers\Patient\ProfilController;
+use App\Http\Controllers\ChatbotController;
 
 
 // Page d’accueil
@@ -115,5 +116,14 @@ Route::middleware(['role:aps'])->prefix('aps')->name('aps.')->group(function () 
     })->name('rendez_vous');
     
 
+});
+
+// ===================== CHATBOT =====================
+Route::middleware('auth')->group(function () {
+    Route::get('/assistant', [ChatbotController::class, 'view'])->name('assistant.view');
+    Route::post('/assistant/chat', [ChatbotController::class, 'chat'])->name('assistant.chat');
+    Route::get('/assistant/conversation/{id}/messages', [ChatbotController::class, 'getConversationMessages'])->name('assistant.conversation.messages');
+    Route::patch('/assistant/conversation/{id}/rename', [ChatbotController::class, 'renameConversation'])->name('assistant.conversation.rename');
+    Route::delete('/assistant/conversation/{id}', [ChatbotController::class, 'deleteConversation'])->name('assistant.conversation.delete');
 });
 

@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -35,4 +34,9 @@ return [
         ],
     ],
 
+    // AI service configuration
+    'ai' => [
+        'base_url' => env('AI_SERVICE_URL', 'http://localhost:8001'),
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
 ];
