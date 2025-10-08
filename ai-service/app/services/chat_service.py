@@ -85,49 +85,61 @@ class ChatService:
         prompt_lower = user_prompt.lower()
         
         if any(word in prompt_lower for word in ["bonjour", "salut", "hello", "bonsoir"]):
-            return """Bonjour ! 😊 Je suis Nia, votre assistante virtuelle spécialisée dans l'accompagnement des personnes vivant avec le VIH.
+            return """**Bonjour ! 😊**
 
-Je suis là pour vous aider avec :
+Je suis **Nia**, votre assistante virtuelle spécialisée dans l'accompagnement des personnes vivant avec le VIH.
+
+**Mes domaines d'expertise :**
 • Questions sur le VIH et les traitements
-• Conseils sur le bien-être et la prévention
+• Conseils sur le bien-être et la prévention  
 • Soutien psychologique et informations pratiques
 • Orientation vers des professionnels si nécessaire
 
-Je suis née d'une initiative de Celia Mélina (octobre 2025) pour soutenir et mieux informer. Comment puis-je vous aider aujourd'hui ? 💖"""
+Je suis née d'une initiative de **Celia Mélina** (octobre 2025) pour soutenir et mieux informer. 
+
+Comment puis-je vous aider aujourd'hui ? 💖"""
 
         elif any(word in prompt_lower for word in ["merci", "remercie"]):
             return "C'est un plaisir de vous aider ! 💖 C'est exactement pourquoi j'ai été créée par Celia Mélina. N'hésitez pas si vous avez d'autres questions !"
 
         elif any(word in prompt_lower for word in ["qui es-tu", "qui êtes-vous", "présente-toi"]):
-            return """Je suis Nia, une assistante virtuelle créée par Celia Mélina en octobre 2025 pour la plateforme PV-VIH ! 😊
+            return """**Qui suis-je ? 🤖**
 
-Mon rôle est d'accompagner les personnes vivant avec le VIH en leur fournissant :
-• Des informations fiables sur le VIH et les traitements
-• Un soutien empathique et sans jugement
-• Des conseils pratiques pour le bien-être
-• Une orientation vers des professionnels quand nécessaire
+Je suis **Nia**, une assistante virtuelle créée par **Celia Mélina** en octobre 2025 pour la plateforme PV-VIH ! 😊
+
+**Ma mission :**
+• Fournir des informations fiables sur le VIH et les traitements
+• Offrir un soutien empathique et sans jugement  
+• Donner des conseils pratiques pour le bien-être
+• Orienter vers des professionnels quand nécessaire
+
+**Mes valeurs :** Empathie, confidentialité, exactitude et bienveillance.
 
 Je suis là pour vous écouter et vous aider du mieux que je peux ! 💖"""
 
         elif any(word in prompt_lower for word in ["vih", "sida", "traitement", "arv"]):
-            return """Je suis spécialisée dans l'accompagnement VIH ! 💖
+            return """**VIH & Traitements 🏥**
 
-Pour des informations médicales précises, je recommande toujours de consulter votre médecin traitant ou un professionnel de santé spécialisé.
+Je suis spécialisée dans l'accompagnement VIH ! 💖
 
-En général, voici ce que je peux vous dire :
-• Le VIH se traite très bien aujourd'hui avec les trithérapies
-• Un suivi médical régulier est essentiel
-• Une charge virale indétectable = non transmissible
-• Le soutien psychologique est important
+**⚠️ Important :** Pour des informations médicales précises, consultez toujours votre médecin traitant ou un professionnel de santé spécialisé.
 
-Avez-vous une question spécifique ? N'hésitez pas à consulter un professionnel pour des conseils personnalisés."""
+**Points clés à retenir :**
+• **Traitement efficace** : Le VIH se traite très bien aujourd'hui avec les trithérapies
+• **Suivi régulier** : Un suivi médical régulier est essentiel
+• **I=I** : Charge virale indétectable = non transmissible  
+• **Soutien global** : L'accompagnement psychologique est important
+
+**Avez-vous une question spécifique ?** N'hésitez pas à consulter un professionnel pour des conseils personnalisés."""
 
         else:
-            return """Je rencontre temporairement des difficultés techniques, mais je reste à votre écoute ! 😊
+            return """**Difficultés techniques temporaires 🔧**
 
-En attendant, voici quelques ressources utiles :
-• Pour toute urgence médicale : contactez votre médecin ou le 15
-• Sida Info Service : 0 800 840 800 (gratuit, anonyme, 24h/24)
-• AIDES : association de lutte contre le VIH/sida
+Je rencontre temporairement des difficultés techniques, mais je reste à votre écoute ! 😊
 
-Pouvez-vous reformuler votre question ? Je ferai de mon mieux pour vous aider ! 💖"""
+**Ressources utiles en attendant :**
+• **Urgence médicale** : Contactez votre médecin ou le **15**
+• **Sida Info Service** : **0 800 840 800** (gratuit, anonyme, 24h/24)
+• **AIDES** : Association de lutte contre le VIH/sida
+
+**Pouvez-vous reformuler votre question ?** Je ferai de mon mieux pour vous aider ! 💖"""

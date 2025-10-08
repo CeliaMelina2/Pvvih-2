@@ -16,8 +16,6 @@
       --chat-bg: #fafbfc;
       --user-msg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       --bot-msg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      /* hauteur du header calculée dynamiquement en JS */
-      --header-h: 72px;
     }
 
     body {
@@ -27,9 +25,46 @@
       overflow-x: hidden;
     }
 
+    .navbar-custom {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1040;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .avatar-ai {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--primary-pink), #ff6b9d);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(208, 17, 104, 0.3);
+    }
+
+    .btn-nav {
+      border-radius: 10px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .btn-nav:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
     .chat-container {
       max-width: 1200px;
-      height: 95vh;
+      height: 100vh;
       backdrop-filter: blur(20px);
       background: rgba(255, 255, 255, 0.95);
       border-radius: 20px;
@@ -41,62 +76,47 @@
       position: relative;
     }
 
-    .chat-header {
-      background: var(--primary-pink);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 20px 20px 0 0;
-      position: sticky;
-      top: 0;
-      z-index: 1050; /* au-dessus de la sidebar */
-      overflow: hidden;
-    }
 
-    .chat-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
-    }
-
-    .chat-header h4 {
-      margin: 0;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
 
     .status-indicator {
-      width: 12px;
-      height: 12px;
+      width: 8px;
+      height: 8px;
       background: #00ff88;
       border-radius: 50%;
       animation: pulse 2s infinite;
+      display: inline-block;
     }
 
     @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .sidebar {
-      background: var(--secondary-light);
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
       border-right: 1px solid var(--border-color);
       height: 100%;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
     }
 
     .sidebar-header {
       padding: 1.5rem;
       border-bottom: 1px solid var(--border-color);
-      background: white;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      backdrop-filter: blur(10px);
     }
 
     .conv-list {
@@ -142,13 +162,13 @@
 
     .messages-area {
       background: var(--chat-bg);
-      flex: 1;
       overflow-y: auto;
       padding: 1.5rem;
+      padding-bottom: 100px; /* Hauteur input-area (70px) + marge (30px) */
       scroll-behavior: smooth;
+      flex: 1;
       min-height: 0;
-      /* espace pour éviter que les derniers messages passent sous l'input */
-      padding-bottom: 120px;
+      height: calc(100vh - 100px); /* Hauteur fixe moins la navbar */
     }
 
     .message-wrapper {
@@ -192,7 +212,32 @@
     }
 
     .message-content {
-      line-height: 1.5;
+      line-height: 1.6;
+    }
+
+    .message-content ul {
+      margin: 0.5rem 0;
+      padding-left: 1.2rem;
+    }
+
+    .message-content li {
+      margin-bottom: 0.3rem;
+      list-style-type: disc;
+    }
+
+    .message-content strong {
+      font-weight: 600;
+      color: var(--primary-pink);
+    }
+
+    .message-bot .message-content strong {
+      color: #c41e3a;
+    }
+
+    .message-content em {
+      font-style: italic;
+      opacity: 0.8;
+      font-size: 0.9em;
     }
 
     .message-time {
@@ -217,12 +262,12 @@
     }
 
     @keyframes slideInBot {
-      0% { 
-        opacity: 0; 
+      0% {
+        opacity: 0;
         transform: translateY(20px) scale(0.9);
       }
-      100% { 
-        opacity: 1; 
+      100% {
+        opacity: 1;
         transform: translateY(0) scale(1);
       }
     }
@@ -253,38 +298,47 @@
     }
 
     @keyframes typingPulse {
-      0%, 80%, 100% { 
+      0%, 80%, 100% {
         transform: scale(0.4);
         opacity: 0.3;
       }
-      40% { 
+      40% {
         transform: scale(1);
         opacity: 1;
       }
     }
 
     .input-area {
-      background: white;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
       border-top: 1px solid var(--border-color);
-      padding: 1.5rem;
-      border-radius: 0 0 20px 20px;
-      position: sticky;
-      bottom: 0; /* reste visible en bas */
-      z-index: 1040; /* sous le header mais au-dessus du contenu */
-      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      padding: 0.75rem 1rem;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 70px;
+      z-index: 1020;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(20px);
     }
 
     .input-group {
-      background: var(--secondary-light);
+      background: white;
       border-radius: 25px;
       padding: 0.5rem;
-      border: 2px solid transparent;
+      border: 2px solid var(--border-color);
       transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .input-group:focus-within {
       border-color: var(--primary-pink);
-      box-shadow: 0 0 0 0.25rem rgba(208, 17, 104, 0.1);
+      box-shadow: 0 4px 20px rgba(208, 17, 104, 0.15);
+      transform: translateY(-1px);
     }
 
     .form-control {
@@ -300,25 +354,28 @@
     }
 
     .btn-send {
-      background: var(--primary-pink);
+      background: linear-gradient(135deg, var(--primary-pink), #ff6b9d);
       border: none;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(208, 17, 104, 0.3);
     }
 
     .btn-send:hover {
-      background: #b50e5a;
-      transform: scale(1.05);
+      background: linear-gradient(135deg, #b50e5a, #e55a87);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(208, 17, 104, 0.4);
     }
 
     .btn-send:disabled {
       opacity: 0.6;
       transform: none;
+      box-shadow: 0 2px 8px rgba(208, 17, 104, 0.2);
     }
 
     .btn-action {
@@ -369,32 +426,79 @@
         border-radius: 0;
         margin: 0;
       }
-      
+
       .message {
         max-width: 85%;
       }
-      
+
       .sidebar {
         position: fixed;
         left: -100%;
-        top: var(--header-h); /* ne recouvre pas le header */
+        top: 0;
         width: 280px;
-        height: calc(100vh - var(--header-h));
-        z-index: 1020; /* sous le header */
+        height: 100vh;
+        z-index: 1025; /* between backdrop and header */
         transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
         background: var(--secondary-light);
       }
-      
+
       .sidebar.show {
         left: 0;
       }
-      
+
       .col-md-8 {
         width: 100% !important;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Ensure proper layout on mobile */
+      .row.g-0.flex-1 {
+        height: calc(100vh - 100px); /* Account for header */
+        flex: 1;
+      }
+
+      .messages-area {
+        padding-bottom: 110px; /* Ajusté pour la nouvelle taille réduite */
+        height: calc(100vh - 80px);
+      }
+
+      .input-area {
+        padding: 0.5rem 1rem;
+        height: 80px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group {
+        max-width: none;
+        margin: 0;
+        padding: 0.4rem;
+      }
+
+      .navbar-custom {
+        padding: 1rem;
+      }
+
+      .avatar-ai {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+      }
+
+      .btn-nav {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-send {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
       }
     }
-    
+
     .sidebar-backdrop {
       position: fixed;
       top: 0;
@@ -407,7 +511,7 @@
       visibility: hidden;
       transition: all 0.3s ease;
     }
-    
+
     .sidebar-backdrop.show {
       opacity: 1;
       visibility: visible;
@@ -435,6 +539,14 @@
       flex: 1;
     }
 
+    /* Structure FLEX pour la zone de chat */
+    .chat-column {
+      display: flex !important;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
     /* Corrections pour la structure */
     .row.flex-1 {
       height: 100%;
@@ -448,35 +560,38 @@
     .sidebar-header {
       flex-shrink: 0;
     }
-
-    .input-area {
-      flex-shrink: 0;
-    }
   </style>
 </head>
 <body>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  
+
   <div class="container-fluid py-3">
     <div class="chat-container mx-auto">
-      <!-- Header -->
-      <div class="chat-header">
+      <!-- Header Principal -->
+      <div class="navbar-custom">
         <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <button class="btn btn-link text-white p-0 me-3 d-md-none" id="toggle-sidebar">
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-link text-primary p-0 d-md-none" id="toggle-sidebar">
               <i class="bi bi-list fs-4"></i>
             </button>
-            <h4 class="mb-0">
-              <i class="bi bi-robot"></i>
-              Nia - Assistant VIH
-              <div class="status-indicator ms-2"></div>
-            </h4>
+            <div class="d-flex align-items-center">
+              <div class="avatar-ai me-3">
+                <i class="bi bi-robot"></i>
+              </div>
+              <div>
+                <h5 class="mb-0 text-dark fw-bold">Nia - Assistant VIH</h5>
+                <small class="text-muted">
+                  <span class="status-indicator me-1"></span>
+                  En ligne et prêt à vous aider
+                </small>
+              </div>
+            </div>
           </div>
           <div class="d-flex gap-2">
-            <a href="#" id="btn-back" class="btn btn-outline-light btn-action">
+            <button type="button" id="btn-back" class="btn btn-secondary btn-nav">
               <i class="bi bi-arrow-left me-1"></i>
-              Retour
-            </a>
+              <span class="d-none d-sm-inline">Retour</span>
+            </button>
           </div>
         </div>
       </div>
@@ -502,7 +617,7 @@
               <input type="text" class="form-control border-0" placeholder="Rechercher..." id="search-conv">
             </div>
           </div>
-          
+
           <div class="conv-list scrollbar-custom" id="conv-list">
             @forelse(($conversations ?? []) as $conv)
               <div class="conv-item" data-id="{{ data_get($conv, 'id', '') }}">
@@ -537,7 +652,7 @@
         </div>
 
         <!-- Chat Area -->
-        <div class="col-md-8 d-flex flex-column">
+        <div class="col-md-8 chat-column">
           <div class="messages-area scrollbar-custom" id="messages">
             <!-- Messages will be populated by JavaScript -->
           </div>
@@ -624,7 +739,7 @@
         document.getElementById('toggle-sidebar')?.addEventListener('click', () => this.toggleSidebar());
         this.backdrop?.addEventListener('click', () => this.closeSidebar());
         document.getElementById('conv-list').addEventListener('click', (e) => this.handleConvClick(e));
-        
+
         // Gestion des actions de conversation
         document.addEventListener('click', (e) => {
           if (e.target.closest('.rename-conv')) {
@@ -637,12 +752,10 @@
         });
 
         document.getElementById('save-rename').addEventListener('click', () => this.saveRename());
-        
+
         // Initialiser avec le message de bienvenue si aucune conversation n'est active
         this.initializeWelcomeMessage();
         this.bindBackButton();
-        this.updateHeaderHeight();
-        window.addEventListener('resize', () => this.updateHeaderHeight());
       }
 
       initializeWelcomeMessage() {
@@ -656,18 +769,10 @@
               "• Conseils sur le bien-être et la prévention<br>" +
               "• Soutien psychologique et informations pratiques<br>" +
               "• Orientation vers des professionnels si nécessaire<br><br>" +
-              "N'hésitez pas à me poser toutes vos questions ! 💖", 
+              "N'hésitez pas à me poser toutes vos questions ! 💖",
               'bot'
             );
           }, 800);
-        }
-      }
-
-      updateHeaderHeight() {
-        const header = document.querySelector('.chat-header');
-        if (header) {
-          const h = header.offsetHeight;
-          document.documentElement.style.setProperty('--header-h', h + 'px');
         }
       }
 
@@ -685,7 +790,7 @@
         this.convId.value = '';
         this.currentConvId = null;
         this.messages.innerHTML = '';
-        
+
         // Afficher une bulle de bienvenue de Nia
         setTimeout(() => {
           this.appendMessage(
@@ -695,11 +800,11 @@
             "• Conseils sur le bien-être et la prévention<br>" +
             "• Soutien psychologique et informations pratiques<br>" +
             "• Orientation vers des professionnels si nécessaire<br><br>" +
-            "N'hésitez pas à me poser toutes vos questions ! 💖", 
+            "N'hésitez pas à me poser toutes vos questions ! 💖",
             'bot'
           );
         }, 500);
-        
+
         document.querySelectorAll('.conv-item').forEach(item => item.classList.remove('active'));
         this.closeSidebar();
       }
@@ -707,23 +812,23 @@
       async handleConvClick(e) {
         const convItem = e.target.closest('.conv-item');
         if (!convItem || e.target.closest('.dropdown')) return;
-        
+
         const convId = convItem.getAttribute('data-id');
         if (!convId) return;
 
         document.querySelectorAll('.conv-item').forEach(item => item.classList.remove('active'));
         convItem.classList.add('active');
-        
+
         this.convId.value = convId;
         this.currentConvId = convId;
         this.closeSidebar();
-        
+
         await this.loadConversationHistory(convId);
       }
 
       async loadConversationHistory(convId) {
         this.messages.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div></div>';
-        
+
         try {
           const response = await fetch(`/assistant/conversation/${convId}/messages`);
           if (response.ok) {
@@ -758,22 +863,51 @@
       appendMessage(text, sender = 'bot', timestamp = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message-wrapper d-flex ${sender === 'user' ? 'justify-content-end' : ''}`;
-        
-        const time = timestamp ? new Date(timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) : 
+
+        const time = timestamp ? new Date(timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) :
                     new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
-        
+
+        // Amélioration du formatage pour les réponses du bot
+        let formattedText = text;
+        if (sender === 'bot') {
+          formattedText = this.formatBotResponse(text);
+        }
+
         messageDiv.innerHTML = `
           <div class="message message-${sender}">
-            <div class="message-content">${text}</div>
+            <div class="message-content">${formattedText}</div>
             <div class="message-time">${time}</div>
           </div>
         `;
-        
+
         this.messages.appendChild(messageDiv);
         this.scrollToBottom();
       }
 
-      showTyping() {
+      formatBotResponse(text) {
+        // Convertir les listes à puces simples
+        text = text.replace(/^[•·]\s*/gm, '<li>');
+        text = text.replace(/^-\s*/gm, '<li>');
+
+        // Wrapper les listes dans des balises ul
+        text = text.replace(/(<li>.*?)(?=\n(?!<li>)|$)/gs, '<ul>$1</ul>');
+        text = text.replace(/<\/ul>\s*<ul>/g, '');
+
+        // Gras pour les titres (mots suivis de : ou **)
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/^([^:\n]{1,50}):\s*$/gm, '<strong>$1 :</strong>');
+
+        // Sources en italique
+        text = text.replace(/Sources:\s*(.*?)$/gm, '<em><i class="bi bi-book me-1"></i>Sources : $1</em>');
+
+        // Numéros de téléphone en gras
+        text = text.replace(/(\d{1,2}\s\d{3}\s\d{3}\s\d{3})/g, '<strong>$1</strong>');
+
+        // Convertir les sauts de ligne en <br>
+        text = text.replace(/\n/g, '<br>');
+
+        return text;
+      }      showTyping() {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'typing-indicator';
         typingDiv.id = 'typing';
@@ -882,7 +1016,7 @@
 
       async deleteConversation(convItem) {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cette conversation ?')) return;
-        
+
         const convId = convItem.getAttribute('data-id');
         try {
           const response = await fetch(`/assistant/conversation/${convId}`, {
