@@ -30,6 +30,7 @@ use App\Http\Controllers\RapportController;
 
 
 use App\Http\Controllers\Patient\ProfilController;
+use App\Http\Controllers\ChatbotController;
 
 
 
@@ -80,6 +81,12 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
     Route::post('/profil/update-info', [ProfilController::class, 'updateInfo'])->name('profil.update_info');
     Route::post('/profil/update-sante', [ProfilController::class, 'updateSante'])->name('profil.update_sante');
     Route::post('/profil/update-password', [ProfilController::class, 'updatePassword'])->name('profil.update_password');
+
+     Route::get('/assistant', [ChatbotController::class, 'view'])->name('assistant.view');
+        Route::post('/assistant/chat', [ChatbotController::class, 'chat'])->name('assistant.chat');
+        Route::get('/assistant/conversation/{id}/messages', [ChatbotController::class, 'getConversationMessages'])->name('assistant.conversation.messages');
+        Route::patch('/assistant/conversation/{id}/rename', [ChatbotController::class, 'renameConversation'])->name('assistant.conversation.rename');
+        Route::delete('/assistant/conversation/{id}', [ChatbotController::class, 'deleteConversation'])->name('assistant.conversation.delete');
 });
 
 
@@ -114,50 +121,38 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Paramètres
     Route::get('/parametres', [AdminController::class, 'parametres'])->name('parametres');
     Route::get('/profil', [AdminController::class, 'profil'])->name('profil');
+
+     Route::get('/assistant', [ChatbotController::class, 'view'])->name('assistant.view');
+        Route::post('/assistant/chat', [ChatbotController::class, 'chat'])->name('assistant.chat');
+        Route::get('/assistant/conversation/{id}/messages', [ChatbotController::class, 'getConversationMessages'])->name('assistant.conversation.messages');
+        Route::patch('/assistant/conversation/{id}/rename', [ChatbotController::class, 'renameConversation'])->name('assistant.conversation.rename');
+        Route::delete('/assistant/conversation/{id}', [ChatbotController::class, 'deleteConversation'])->name('assistant.conversation.delete');
 });
 
-Route::middleware(['role:aps'])->prefix('aps')->name('aps.')->group(function () {
+    Route::middleware(['role:aps'])->prefix('aps')->name('aps.')->group(function () {
 
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/stats', [DashboardController::class, 'getStats'])->name('stats');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/stats', [DashboardController::class, 'getStats'])->name('stats');
 
-    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
-    Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
-    Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
-    Route::delete('/patients/{id}', [PatientController::class, 'destroy'])->name('patients.destroy');
-    Route::post('/patients/{id}/traitements', [PatientController::class, 'assignTraitement'])->name('patients.traitement');
+        Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+        Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
+        Route::put('/patients/{id}', [PatientController::class, 'update'])->name('patients.update');
+        Route::delete('/patients/{id}', [PatientController::class, 'destroy'])->name('patients.destroy');
+        Route::post('/patients/{id}/traitements', [PatientController::class, 'assignTraitement'])->name('patients.traitement');
 
-    Route::get('/rendezvous', [RendezVousController::class, 'indexaps'])->name('rendezvous.index');
-    Route::post('/rendezvous', [RendezVousController::class, 'storeaps'])->name('rendezvous.store');
-    Route::put('/rendezvous/{id}', [RendezVousController::class, 'update'])->name('rendezvous.update');
-    Route::delete('/rendezvous/{id}', [RendezVousController::class, 'destroy'])->name('rendezvous.destroy');
-    Route::patch('/rendezvous/{id}/status', [RendezVousController::class, 'updateStatus'])->name('rendezvous.status');
+        Route::get('/rendezvous', [RendezVousController::class, 'indexaps'])->name('rendezvous.index');
+        Route::post('/rendezvous', [RendezVousController::class, 'storeaps'])->name('rendezvous.store');
+        Route::put('/rendezvous/{id}', [RendezVousController::class, 'update'])->name('rendezvous.update');
+        Route::delete('/rendezvous/{id}', [RendezVousController::class, 'destroy'])->name('rendezvous.destroy');
+        Route::patch('/rendezvous/{id}/status', [RendezVousController::class, 'updateStatus'])->name('rendezvous.status');
 
-    Route::get('/traitements', [App\Http\Controllers\TraitementController::class, 'index'])->name('traitements.index');
-    Route::post('/traitements', [App\Http\Controllers\TraitementController::class, 'store'])->name('traitements.store');
-    Route::put('/traitements/{id}', [App\Http\Controllers\TraitementController::class, 'update'])->name('traitements.update');
-    Route::delete('/traitements/{id}', [App\Http\Controllers\TraitementController::class, 'destroy'])->name('traitements.destroy');
-    Route::post('/traitements/{id}/toggle-status', [App\Http\Controllers\TraitementController::class, 'toggleStatus'])->name('traitements.toggle-status');
-
-    
-    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
-    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-    Route::get('/messages/{message}', [MessageController::class, 'show'])->name('messages.show');
-    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
-    Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
-    
-    Route::get('/dossiers-medicaux', [DossierMedicalController::class, 'index'])->name('dossiers.index');
-    Route::get('/dossiers-medicaux/{patient}', [DossierMedicalController::class, 'show'])->name('dossiers.show');
-    Route::get('/dossiers-medicaux/{patient}/edit', [DossierMedicalController::class, 'edit'])->name('dossiers.edit');
-    Route::put('/dossiers-medicaux/{patient}', [DossierMedicalController::class, 'update'])->name('dossiers.update');
-    Route::post('/dossiers-medicaux/{patient}/consultation', [DossierMedicalController::class, 'addConsultation'])->name('dossiers.add-consultation');
-    
-    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
-    Route::put('/profil/password', [ProfilController::class, 'updatePassword'])->name('profil.update-password');
-    
-    Route::get('/rapports', [DashboardController::class, 'rapports'])->name('rapports');
-    Route::get('/statistiques', [DashboardController::class, 'statistiques'])->name('statistiques');
 });
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/assistant', [ChatbotController::class, 'view'])->name('assistant.view');
+        Route::post('/assistant/chat', [ChatbotController::class, 'chat'])->name('assistant.chat');
+        Route::get('/assistant/conversation/{id}/messages', [ChatbotController::class, 'getConversationMessages'])->name('assistant.conversation.messages');
+        Route::patch('/assistant/conversation/{id}/rename', [ChatbotController::class, 'renameConversation'])->name('assistant.conversation.rename');
+        Route::delete('/assistant/conversation/{id}', [ChatbotController::class, 'deleteConversation'])->name('assistant.conversation.delete');
+    });

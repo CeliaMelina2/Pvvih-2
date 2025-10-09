@@ -11,7 +11,9 @@ class CreateRendezVousTable extends Migration
         Schema::create('rendez_vous', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patient_id')->constrained()->onDelete('cascade');
-            $table->foreignId('aps_id')->nullable()->constrained('aps');
+            $table->unsignedBigInteger('aps_id');
+            $table->foreign('aps_id')->references('idAPS')->on('aps')->onDelete('cascade');
+            $table->string('medecin_nom');
             $table->dateTime('date_heure');
             $table->string('motif');
             $table->string('statut')->default('En attente');

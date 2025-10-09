@@ -152,6 +152,11 @@
             <span class="badge text-bg-danger">5</span>
         </a>
         
+        {{-- Lien direct vers l'assistant IA --}}
+        <a href="{{ route('assistant.view') }}" class="btn btn-sm btn-icon position-relative" title="Assistant VIH">
+            <i class="bi bi-robot"></i>
+        </a>
+        
         <div class="dropdown profile-dropdown">
             <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="/images/profile.png" alt="mdo" class="profile-img">
@@ -165,6 +170,7 @@
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{{ route('patient.dossier_medical') }}">Mon dossier</a></li>
                 <li><a class="dropdown-item" href="{{ route('patient.profil') }}">Paramètres</a></li>
+                <li><a class="dropdown-item" href="{{ route('assistant.view') }}">Assistant VIH</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form action="{{ route('logout') }}" method="POST">
