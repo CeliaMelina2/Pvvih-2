@@ -12,10 +12,9 @@ class CreateRendezVousTable extends Migration
             $table->id();
             $table->foreignId('patient_id')->constrained()->onDelete('cascade');
             $table->foreignId('aps_id')->nullable()->constrained('aps');
-            $table->string('medecin_nom');
             $table->dateTime('date_heure');
             $table->string('motif');
-            $table->string('statut')->default('En attente'); // Confirmé, En attente, Annulé, Terminé
+            $table->string('statut')->default('En attente');
             $table->timestamps();
         });
     }

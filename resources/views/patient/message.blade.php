@@ -129,7 +129,7 @@
                     Bonjour, j'ai bien reçu votre demande de rendez-vous. Nous pouvons le fixer pour le 19 septembre. Est-ce que cela vous convient ?
                 </div>
                 <div class="sent-message">
-                    Bonjour M. Dupont, oui, le 19 septembre est parfait pour moi. Merci beaucoup !
+                    Bonjour M. Essomba, oui, le 19 septembre est parfait pour moi. Merci beaucoup !
                 </div>
                 <div class="received-message">
                     Parfait, je vous envoie la confirmation. Prenez soin de vous.

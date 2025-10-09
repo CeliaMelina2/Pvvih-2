@@ -110,7 +110,7 @@
 
                 <div class="text-center mb-4">
                     <img src="{{ asset('images/LOGOV.png') }}" alt="Logo" class="logo mb-2">
-                    <h2 class="title">Inscription APS</h2>
+                    <h2 class="title">Inscription Patient</h2>
                 </div>
 
                 <div class="mb-3">

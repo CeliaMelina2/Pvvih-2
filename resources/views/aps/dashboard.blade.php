@@ -47,15 +47,27 @@
     .activity-item .icon { font-size:1.5rem; color:#6f42c1; }
     .activity-item .desc { color:#4b286d; font-size:1rem; }
     .activity-item .time { color:#adb5bd; font-size:0.85rem; }
+
+    .status-badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 600;
+        border-radius: 0.375rem;
+    }
+    
+    .status-en_attente { background-color: #fff3cd; color: #856404; }
+    .status-confirme { background-color: #d1ecf1; color: #0c5460; }
+    .status-annule { background-color: #f8d7da; color: #721c24; }
+    .status-effectue { background-color: #d4edda; color: #155724; }
 </style>
 
 <div class="container-fluid dashboard-bg py-4">
     <div class="dashboard-header mb-4">
         <h1>Tableau de bord Médecin</h1>
         <div class="profile">
-            <img src="https://ui-avatars.com/api/?name=Dr+Médecin&background=6f42c1&color=fff&size=48" alt="Avatar">
+            <img src="https://ui-avatars.com/api/?name={{ urlencode($aps->nom) }}&background=6f42c1&color=fff&size=48" alt="Avatar">
             <div>
-                <div class="name">Dr. Médecin</div>
+                <div class="name">{{ $aps->nom }}</div>
                 <div class="role">Médecin généraliste</div>
             </div>
         </div>
@@ -67,7 +79,7 @@
             <div class="card-modern text-center">
                 <div class="stat-icon"><i class="bi bi-people-fill text-primary"></i></div>
                 <div class="stat-label">Patients actifs</div>
-                <div class="stat-value">152</div>
+                <div class="stat-value">{{ $patientsCount }}</div>
                 <div class="trend-up"><i class="bi bi-arrow-up"></i> +3% ce mois</div>
             </div>
         </div>
@@ -75,7 +87,7 @@
             <div class="card-modern text-center">
                 <div class="stat-icon"><i class="bi bi-calendar-check text-success"></i></div>
                 <div class="stat-label">Rendez-vous à venir</div>
-                <div class="stat-value">12</div>
+                <div class="stat-value">{{ $upcomingAppointments }}</div>
                 <div class="trend-up"><i class="bi bi-arrow-up"></i> +8% semaine</div>
             </div>
         </div>
@@ -83,7 +95,7 @@
             <div class="card-modern text-center">
                 <div class="stat-icon"><i class="bi bi-chat-dots-fill text-info"></i></div>
                 <div class="stat-label">Messages non lus</div>
-                <div class="stat-value">5</div>
+                <div class="stat-value">{{ $unreadMessages }}</div>
                 <div class="trend-down"><i class="bi bi-arrow-down"></i> -2% semaine</div>
             </div>
         </div>
@@ -91,7 +103,7 @@
             <div class="card-modern text-center">
                 <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></div>
                 <div class="stat-label">Alertes critiques</div>
-                <div class="stat-value">3</div>
+                <div class="stat-value">{{ $criticalAlerts }}</div>
                 <div class="trend-up"><i class="bi bi-arrow-up"></i> +1 aujourd'hui</div>
             </div>
         </div>
@@ -101,10 +113,18 @@
     <div class="row mb-4 quick-actions">
         <div class="col-12 col-md-8">
             <div class="d-flex flex-wrap gap-3">
-                <a href="#" class="btn btn-primary"><i class="bi bi-person-plus-fill me-2"></i> Nouveau patient</a>
-                <a href="#" class="btn btn-outline"><i class="bi bi-calendar-plus-fill me-2"></i> Nouveau rendez-vous</a>
-                <a href="#" class="btn btn-outline"><i class="bi bi-capsule-pill me-2"></i> Nouveau traitement</a>
-                <a href="#" class="btn btn-outline"><i class="bi bi-chat-text-fill me-2"></i> Envoyer un message</a>
+                <a href="{{ route('aps.patients.create') }}" class="btn btn-primary">
+                    <i class="bi bi-person-plus-fill me-2"></i> Nouveau patient
+                </a>
+                <a href="{{ route('aps.rendezvous.create') }}" class="btn btn-outline">
+                    <i class="bi bi-calendar-plus-fill me-2"></i> Nouveau rendez-vous
+                </a>
+                <a href="{{ route('aps.traitements.create') }}" class="btn btn-outline">
+                    <i class="bi bi-capsule-pill me-2"></i> Nouveau traitement
+                </a>
+                <a href="{{ route('aps.messages.index') }}" class="btn btn-outline">
+                    <i class="bi bi-chat-text-fill me-2"></i> Envoyer un message
+                </a>
             </div>
         </div>
         <div class="col-12 col-md-4 mt-3 mt-md-0">
@@ -134,33 +154,56 @@
                                 <th>Patient</th>
                                 <th>Date</th>
                                 <th>Heure</th>
-                                <th>Type</th>
-                                <th></th>
+                                <th>Statut</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($nextAppointments as $rdv)
                             <tr>
-                                <td><img src="https://ui-avatars.com/api/?name=Jean+Dupont&background=6f42c1&color=fff&size=32" class="rounded-circle me-2" style="width:32px;"> Jean Dupont</td>
-                                <td>15/09/2025</td>
-                                <td>10:00</td>
-                                <td><span class="badge bg-primary">Consultation</span></td>
-                                <td><a href="#" class="btn btn-sm btn-outline-secondary">Détails</a></td>
+                                <td>
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($rdv->patient->nom) }}&background=6f42c1&color=fff&size=32" 
+                                         class="rounded-circle me-2" style="width:32px;">
+                                    {{ $rdv->patient->nom }}
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($rdv->date_heure)->format('d/m/Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($rdv->date_heure)->format('H:i') }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ $rdv->statut }}">
+                                        {{ $rdv->statut }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('aps.rendezvous.edit', $rdv->id) }}" 
+                                           class="btn btn-sm btn-outline-primary">Modifier</a>
+                                        @if($rdv->statut == 'en_attente')
+                                        <form action="{{ route('aps.rendezvous.confirm', $rdv->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success">Confirmer</button>
+                                        </form>
+                                        @endif
+                                    </div>
+                                </td>
                             </tr>
+                            @empty
                             <tr>
-                                <td><img src="https://ui-avatars.com/api/?name=Marie+Durand&background=6f42c1&color=fff&size=32" class="rounded-circle me-2" style="width:32px;"> Marie Durand</td>
-                                <td>16/09/2025</td>
-                                <td>14:00</td>
-                                <td><span class="badge bg-primary">Suivi</span></td>
-                                <td><a href="#" class="btn btn-sm btn-outline-secondary">Détails</a></td>
+                                <td colspan="5" class="text-center text-muted py-3">
+                                    Aucun rendez-vous à venir
+                                </td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="card-footer text-center">
-                    <a href="#" class="text-decoration-none fw-bold text-primary">Voir tous les rendez-vous <i class="bi bi-arrow-right"></i></a>
+                    <a href="{{ route('aps.rendezvous.index') }}" class="text-decoration-none fw-bold text-primary">
+                        Voir tous les rendez-vous <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
+        
         <!-- Messages récents -->
         <div class="col-lg-6">
             <div class="card-modern h-100">
@@ -169,24 +212,28 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="activity-feed px-3 pt-3">
+                        @forelse($recentMessages as $message)
                         <div class="activity-item">
                             <span class="icon"><i class="bi bi-chat-left-text"></i></span>
                             <div>
-                                <div class="desc"><strong>Jean Dupont</strong> : Bonjour docteur, j’ai une question sur mon traitement.</div>
-                                <div class="time">2h ago</div>
+                                <div class="desc">
+                                    <strong>{{ $message->patient->nom }}</strong> : 
+                                    {{ Str::limit($message->contenu, 50) }}
+                                </div>
+                                <div class="time">{{ $message->created_at->diffForHumans() }}</div>
                             </div>
                         </div>
-                        <div class="activity-item">
-                            <span class="icon"><i class="bi bi-chat-left-text"></i></span>
-                            <div>
-                                <div class="desc"><strong>Marie Durand</strong> : Merci pour le suivi, tout va bien.</div>
-                                <div class="time">4h ago</div>
-                            </div>
+                        @empty
+                        <div class="text-center text-muted py-3">
+                            Aucun message récent
                         </div>
+                        @endforelse
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a href="#" class="text-decoration-none fw-bold text-primary">Voir tous les messages <i class="bi bi-arrow-right"></i></a>
+                    <a href="{{ route('aps.messages.index') }}" class="text-decoration-none fw-bold text-primary">
+                        Voir tous les messages <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -198,43 +245,48 @@
             <div class="card-modern p-4 h-100">
                 <div class="section-title mb-3">Activité récente</div>
                 <div class="activity-feed">
+                    @forelse($recentActivity as $activity)
                     <div class="activity-item">
                         <span class="icon"><i class="bi bi-calendar-check"></i></span>
                         <div>
-                            <div class="desc">Consultation terminée avec Jean Dupont</div>
-                            <div class="time">Hier</div>
+                            <div class="desc">
+                                Consultation avec {{ $activity->patient->nom }} - 
+                                {{ $activity->motif }}
+                            </div>
+                            <div class="time">{{ \Carbon\Carbon::parse($activity->date_heure)->diffForHumans() }}</div>
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <span class="icon"><i class="bi bi-capsule-pill"></i></span>
-                        <div>
-                            <div class="desc">Traitement ajouté pour Marie Durand</div>
-                            <div class="time">2 jours ago</div>
-                        </div>
+                    @empty
+                    <div class="text-center text-muted py-3">
+                        Aucune activité récente
                     </div>
+                    @endforelse
                 </div>
             </div>
         </div>
+        
         <div class="col-lg-4">
             <div class="card-modern p-4 h-100">
                 <div class="section-title mb-3">Alertes critiques</div>
                 <ul class="list-group list-group-flush">
+                    @forelse($criticalPatients as $patient)
                     <li class="list-group-item d-flex align-items-center">
                         <span class="me-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
                         <div>
-                            <div class="fw-bold">Tension élevée</div>
-                            <div class="text-muted" style="font-size:0.95rem;">Patient Jean Dupont - 160/100 mmHg</div>
-                            <div class="time" style="font-size:0.85rem;">Il y a 1h</div>
+                            <div class="fw-bold">{{ $patient->nom }}</div>
+                            <div class="text-muted" style="font-size:0.95rem;">
+                                {{ $patient->dossierMedical->first()->motif_urgence ?? 'Alerte médicale' }}
+                            </div>
+                            <div class="time" style="font-size:0.85rem;">
+                                Dernière consultation: {{ $patient->updated_at->diffForHumans() }}
+                            </div>
                         </div>
                     </li>
-                    <li class="list-group-item d-flex align-items-center">
-                        <span class="me-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
-                        <div>
-                            <div class="fw-bold">Alerte médication</div>
-                            <div class="text-muted" style="font-size:0.95rem;">Patient Marie Durand - Dosage oublié</div>
-                            <div class="time" style="font-size:0.85rem;">Il y a 2h</div>
-                        </div>
+                    @empty
+                    <li class="list-group-item text-center text-muted">
+                        Aucune alerte critique
                     </li>
+                    @endforelse
                 </ul>
             </div>
         </div>
@@ -242,7 +294,72 @@
 
     <!-- Footer -->
     <div class="text-center text-muted mt-4" style="font-size:0.95rem;">
-        &copy; 2025 Pvvih - Tableau de bord Médecin. Design fictif.
+        &copy; 2025 Pvvih - Tableau de bord Médecin
     </div>
 </div>
+
+<!-- Modals pour actions rapides -->
+<div class="modal fade" id="quickActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickActionModalLabel">Action rapide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickActionModalBody">
+                <!-- Le contenu sera chargé dynamiquement -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script pour les actions rapides
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des actions rapides
+    const quickActionModal = new bootstrap.Modal(document.getElementById('quickActionModal'));
+    
+    // Exemple d'action rapide pour nouveau rendez-vous
+    document.querySelectorAll('[data-quick-action]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const action = this.getAttribute('data-quick-action');
+            loadQuickAction(action);
+        });
+    });
+    
+    function loadQuickAction(action) {
+        // Ici vous pouvez charger du contenu dynamique selon l'action
+        const modalBody = document.getElementById('quickActionModalBody');
+        const modalLabel = document.getElementById('quickActionModalLabel');
+        
+        switch(action) {
+            case 'new-patient':
+                modalLabel.textContent = 'Nouveau Patient';
+                modalBody.innerHTML = `
+                    <form action="{{ route('aps.patients.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Nom complet</label>
+                            <input type="text" name="nom" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" name="telephone" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Créer le patient</button>
+                    </form>
+                `;
+                break;
+            // Ajouter d'autres cas pour les autres actions
+        }
+        
+        quickActionModal.show();
+    }
+});
+</script>
 @endsection

@@ -2,78 +2,99 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aps;
-use App\Models\User;
+use App\Models\Patient;
+use App\Models\Traitement;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
-class ApsController extends Controller
+class PatientController extends Controller
 {
-    // Liste des APS
     public function index()
     {
-        return response()->json(Aps::all());
+        $patients = Patient::with('traitements')->get();
+        return view('aps.patients', compact('patients'));
     }
 
-    // Formulaire inscription (si Blade)
-    public function create()
-    {
-        return view('inscription_aps');
-    }
-
-    // Sauvegarder un APS
     public function store(Request $request)
     {
         $request->validate([
-            'nom' => 'required',
-            'prenom' => 'required',
-            'sexe' => 'required',
-            'telephone' => 'required|unique:aps',
-            'email' => 'required|email|unique:aps',
-            'password' => 'required|min:8',
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:patients',
+            'telephone' => 'required|string|max:20',
+            'date_naissance' => 'required|date',
         ]);
 
-        $aps = Aps::create([
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'sexe' => $request->sexe,
-            'telephone' => $request->telephone,
-            'adresse' => $request->adresse,
-            'attestation_fonction' => $request->attestation_fonction,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-     $user = User::create([
-        'name' => $request->nom,          // correspond à la colonne "name"
-        'prenom' => $request->prenom,     // ajouter "prenom" dans $fillable
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => 'aps',
-    ]);
-
-
-        return redirect()->route('aps.dashboard');
+        try {
+            Patient::create($request->all());
+            return redirect()->route('patients.index')->with('success', 'Patient créé avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de la création du patient.');
+        }
     }
 
-    // Afficher un APS
     public function show($id)
     {
-        return Aps::findOrFail($id);
+        $patient = Patient::with('traitements')->findOrFail($id);
+        return view('patients.show', compact('patient'));
     }
 
-    // Modifier un APS
     public function update(Request $request, $id)
     {
-        $aps = Aps::findOrFail($id);
-        $aps->update($request->all());
-        return response()->json($aps);
+        $patient = Patient::findOrFail($id);
+        
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:patients,email,' . $id,
+            'telephone' => 'required|string|max:20',
+            'date_naissance' => 'required|date',
+        ]);
+
+        try {
+            $patient->update($request->all());
+            return redirect()->route('patients.index')->with('success', 'Patient modifié avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de la modification du patient.');
+        }
     }
 
-    // Supprimer un APS
     public function destroy($id)
     {
-        Aps::destroy($id);
-        return response()->json(['message' => 'APS supprimé']);
+        try {
+            $patient = Patient::findOrFail($id);
+            $patient->delete();
+            return redirect()->route('patients.index')->with('success', 'Patient supprimé avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de la suppression du patient.');
+        }
+    }
+
+    public function storeTraitement(Request $request)
+    {
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+            'medicament' => 'required|string|max:255',
+            'posologie' => 'required|string',
+            'duree' => 'required|string|max:255',
+        ]);
+
+        try {
+            Traitement::create($request->all());
+            return redirect()->route('patients.index')->with('success', 'Traitement assigné avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de l\'assignation du traitement.');
+        }
+    }
+
+    public function destroyTraitement($id)
+    {
+        try {
+            $traitement = Traitement::findOrFail($id);
+            $traitement->delete();
+            return redirect()->back()->with('success', 'Traitement supprimé avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de la suppression du traitement.');
+        }
     }
 }

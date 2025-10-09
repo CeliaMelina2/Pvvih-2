@@ -13,8 +13,6 @@ class Patient extends Authenticatable
     protected $fillable = [
         'nom',
         'prenom',
-        'email',
-        'password',
         'sexe',
         'telephone',
         'adresse',
@@ -34,10 +32,11 @@ class Patient extends Authenticatable
         return $this->belongsTo(User::class);
     }
 
-     public function rendezvous()
+     public function rendez_vous()
     {
         return $this->hasMany(RendezVous::class);
     }
+    
 
     public function traitements()
     {
@@ -52,5 +51,10 @@ class Patient extends Authenticatable
     public function aps()
     {
         return $this->belongsTo(Aps::class);
+    }
+
+    public function transfert()
+    {
+        return $this->hasOne(Transfert::class);
     }
 }

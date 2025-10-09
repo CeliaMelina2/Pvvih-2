@@ -5,32 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Traitement extends Model
+class Transfert extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'patient_id',
-        'nom_medicament',
-        'posologie',
-        'date_debut',
-        'date_fin_prevue',
-        'frequence',
+        'aps_id', 
+        'centre_id',
+        'date_heure',
+        'motif',
+        'dossier', 
         'statut',
     ];
 
-
-    // Relation avec le patient
     public function patient()
     {
         return $this->belongsTo(Patient::class);
     }
 
-    // Relation avec l'APS via le patient
     public function aps()
     {
-        return $this->hasOneThrough(Aps::class, Patient::class, 'id', 'id', 'patient_id', 'aps_id');
+        return $this->belongsTo(Aps::class);
+    }
+
+    public function centres()
+    {
+        return $this->belongsTo(Centre::class);
     }
 }
-
-

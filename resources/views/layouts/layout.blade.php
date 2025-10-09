@@ -33,6 +33,7 @@
             <main class="flex-grow-1 p-4 overflow-auto">
                 @yield('content')
             </main>
+            </nav>
 
         </div>
     </div>

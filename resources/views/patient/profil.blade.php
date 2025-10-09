@@ -64,11 +64,12 @@
                 <img src="/images/profile.png" alt="Profil du patient" class="profile-img">
             </div>
             <div class="text-center text-md-start">
-                <h4 class="fw-bold mb-1">Nom Prénom du Patient</h4>
-                <p class="text-muted mb-2">Patient depuis le 10/09/2024</p>
+                <h4 class="fw-bold mb-1">{{ $patient->nom}}</h4>
+                <p class="text-muted mb-2">Patient depuis {{ $patient->created_at }}</p>
                 <span class="badge profile-badge">Actif</span>
             </div>
         </div>
+        
     </div>
 
     <div class="row g-4 mb-5">
@@ -83,23 +84,23 @@
                 <ul class="list-unstyled info-list">
                     <li>
                         <div class="info-label">Nom et Prénom</div>
-                        <div class="info-value">Prénom Nom</div>
+                        <div class="info-value">{{ $patient->nom }} {{ $patient->prenom }}</div>
                     </li>
                     <li>
                         <div class="info-label">Email</div>
-                        <div class="info-value">patient.nom@feelinghplus.com</div>
+                        <div class="info-value">{{ $patient->email }}</div>
                     </li>
                     <li>
                         <div class="info-label">Téléphone</div>
-                        <div class="info-value">237 6 78 90 12 34</div>
+                        <div class="info-value">{{ $patient->telephone }}</div>
                     </li>
                     <li>
                         <div class="info-label">Adresse</div>
-                        <div class="info-value">BP 1234, Yaoundé, Cameroun</div>
+                        <div class="info-value">{{ $patient->adresse }}</div>
                     </li>
                     <li>
                         <div class="info-label">Sexe</div>
-                        <div class="info-value">Homme</div>
+                        <div class="info-value">{{ $patient->sexe }}</div>
                     </li>
                 </ul>
             </div>
@@ -116,23 +117,23 @@
                 <ul class="list-unstyled info-list">
                     <li>
                         <div class="info-label">Statut sérologique</div>
-                        <div class="info-value text-danger">Positif</div>
+                        <div class="info-value text-danger">{{ $patient->statut_serologique }}</div>
                     </li>
                     <li>
                         <div class="info-label">Code TARV</div>
-                        <div class="info-value">A-123-BC</div>
+                        <div class="info-value">{{ $patient->codeTARV }}</div>
                     </li>
                     <li>
                         <div class="info-label">Date de diagnostic</div>
-                        <div class="info-value">01/01/2024</div>
+                        <div class="info-value">{{ $patient->date_diagnostic }}</div>
                     </li>
                     <li>
                         <div class="info-label">Allergies connues</div>
-                        <div class="info-value">Pénicilline</div>
+                          <div class="info-value">Aucune allergie .</div>
                     </li>
                     <li>
                         <div class="info-label">APS assigné</div>
-                        <div class="info-value">M. Jean-Marc Dupont</div>
+                        <div class="info-value">{{ $patient->codeTARV }}  </div>
                     </li>
                 </ul>
             </div>

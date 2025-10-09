@@ -1,356 +1,572 @@
-    @extends('layouts.layout')
+@extends('layouts.layout')
 
-    @section('content')
-    <style>
-        :root {
-            --main-bg: #fdf5f8;
-            --main-accent: #e83e8c;
-            --main-accent-light: #fce4ec;
-            --main-accent-dark: #c2185b;
-            --main-green: #28a745;
-            --main-red: #dc3545;
-            --main-blue: #3498db;
-            --main-yellow: #ffc107;
-            --main-gray: #adb5bd;
-            --main-white: #fff;
-            --main-shadow: 0 4px 24px rgba(232, 62, 140, 0.08);
-        }
-        body {
-            background-color: var(--main-bg);
-            font-family: 'Inter', sans-serif;
-        }
-        .container-fluid {
-            background-color: var(--main-bg);
-        }
-        .rendezvous-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2.5rem;
-        }
-        .rendezvous-header h1 {
-            font-weight: 800;
-            color: var(--main-accent-dark);
-            letter-spacing: -1px;
-            font-size: 2.2rem;
-        }
-        .rendezvous-header .btn {
-            border-radius: 0.75rem;
-            font-weight: 600;
-            background: var(--main-accent);
-            color: #fff;
-            border: none;
-            box-shadow: 0 2px 8px rgba(232, 62, 140, 0.07);
-            transition: background 0.2s, color 0.2s;
-        }
-        .rendezvous-header .btn:hover {
-            background: var(--main-accent-dark);
-        }
-        .card-modern {
-            border: none;
-            border-radius: 1.25rem;
-            box-shadow: var(--main-shadow);
-            background: var(--main-white);
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .card-modern:hover {
-            box-shadow: 0 8px 32px rgba(232, 62, 140, 0.15);
-            transform: translateY(-2px);
-        }
-        .section-title {
-            font-weight: 700;
-            color: var(--main-accent-dark);
-            margin-bottom: 1.2rem;
-            font-size: 1.3rem;
-        }
-        .table-modern {
-            border-radius: 1rem;
-            overflow: hidden;
-            background: var(--main-white);
-            box-shadow: var(--main-shadow);
-        }
-        .table-modern th {
-            background: var(--main-accent-light);
-            color: var(--main-accent-dark);
-            border-bottom: 2px solid var(--main-accent);
-        }
-        .table-modern td {
-            vertical-align: middle;
-        }
-        .badge-status {
-            font-size: 0.95rem;
-            border-radius: 0.5rem;
-            padding: 0.3em 0.8em;
-            color: white;
-            font-weight: 600;
-        }
-        .badge-success { background: var(--main-green); }
-        .badge-warning { background: var(--main-yellow); }
-        .badge-danger { background: var(--main-red); }
-        .badge-info { background: var(--main-blue); }
-        .activity-feed {
-            max-height: 320px;
-            overflow-y: auto;
-        }
-        .activity-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1.2rem;
-        }
-        .activity-item .icon {
-            font-size: 1.5rem;
-            color: var(--main-accent);
-        }
-        .activity-item .desc {
-            color: var(--main-accent-dark);
-            font-size: 1rem;
-        }
-        .activity-item .time {
-            color: var(--main-gray);
-            font-size: 0.85rem;
-        }
-        @media (max-width: 767px) {
-            .rendezvous-header h1 {
-                font-size: 1.3rem;
-            }
-        }
-    </style>
+@section('content')
+<style>
+    :root {
+        --primary-color: #ea66a8ff;
+        --primary-light: #a3b4f8;
+        --primary-dark: #d85a8fff;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #f63baeff;
+        --gray-color: #6b7280;
+        --light-bg: #fcf8faff;
+        --card-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        --card-hover: 0 20px 40px rgba(0,0,0,0.1);
+    }
 
-    @php
-        // Fake rendez-vous
-        $rendezVousList = [
-            (object)[
-                'patient' => (object)['nom' => 'Jean Dupont'],
-                'date' => '2025-09-15',
-                'heure' => '10:00',
-                'type' => 'Consultation',
-                'statut' => 'à venir'
-            ],
-            (object)[
-                'patient' => (object)['nom' => 'Marie Durand'],
-                'date' => '2025-09-14',
-                'heure' => '14:30',
-                'type' => 'Suivi',
-                'statut' => 'terminé'
-            ],
-            (object)[
-                'patient' => (object)['nom' => 'Paul Martin'],
-                'date' => '2025-09-12',
-                'heure' => '09:00',
-                'type' => 'Consultation',
-                'statut' => 'annulé'
-            ],
-            (object)[
-                'patient' => (object)['nom' => 'Sophie Legrand'],
-                'date' => '2025-09-16',
-                'heure' => '11:00',
-                'type' => 'Vaccination',
-                'statut' => 'à venir'
-            ]
-        ];
+    body {
+        background: var(--light-bg);
+        font-family: 'Inter', sans-serif;
+    }
 
-        // Fake statistiques
-        $totalRendezVous = count($rendezVousList);
-        $upcomingCount = count(array_filter($rendezVousList, fn($r) => $r->statut === 'à venir'));
-        $completedCount = count(array_filter($rendezVousList, fn($r) => $r->statut === 'terminé'));
-        $cancelledCount = count(array_filter($rendezVousList, fn($r) => $r->statut === 'annulé'));
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: var(--card-shadow);
+    }
 
-        // Fake activité récente
-        $recentActivities = [
-            (object)['icon' => 'calendar-check', 'description' => 'Rendez-vous terminé avec Jean Dupont', 'created_at' => now()->subDay()],
-            (object)['icon' => 'capsule-pill', 'description' => 'Prescription ajoutée pour Marie Durand', 'created_at' => now()->subDays(2)],
-            (object)['icon' => 'chat-dots', 'description' => 'Message envoyé à Paul Martin', 'created_at' => now()]
-        ];
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
 
-        // Autres stats
-        $avgDuration = 35;
-        $cancelRate = 12;
-        $satisfaction = 95;
-    @endphp
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+    }
 
-    <div class="container-fluid py-4" style="background:var(--main-bg); min-height:90vh;">
-        <div class="rendezvous-header mb-4">
-            <h1>Gestion des rendez-vous</h1>
-            <a href="#" class="btn"><i class="bi bi-calendar-plus me-2"></i>Ajouter un rendez-vous</a>
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover);
+    }
+
+    .stat-card.total { border-left-color: var(--primary-color); }
+    .stat-card.a-venir { border-left-color: var(--info-color); }
+    .stat-card.termines { border-left-color: var(--success-color); }
+    .stat-card.annules { border-left-color: var(--danger-color); }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--gray-color);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .card-modern {
+        background: white;
+        border-radius: 20px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+    }
+
+    .card-modern:hover {
+        box-shadow: var(--card-hover);
+    }
+
+    .card-header-modern {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        border-radius: 20px 20px 0 0 !important;
+        padding: 1.5rem 2rem;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .btn-modern {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-modern {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+    }
+
+    .btn-primary-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .table-modern {
+        margin: 0;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .table-modern thead th {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        padding: 1.2rem 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody td {
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
+        border-color: #f1f5f9;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .badge-status {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-en_attente { background: #fef3c7; color: #d97706; }
+    .badge-confirme { background: #d1fae5; color: #065f46; }
+    .badge-termine { background: #dbeafe; color: #1e40af; }
+    .badge-annule { background: #fee2e2; color: #dc2626; }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
+
+    .modal-modern .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: var(--card-hover);
+    }
+
+    .modal-modern .modal-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        border: none;
+    }
+
+    .form-control-modern {
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control-modern:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .patient-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .status-select {
+        border-radius: 10px;
+        padding: 6px 12px;
+        border: 2px solid #e5e7eb;
+        background: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête du tableau de bord -->
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-6 fw-bold mb-2">Gestion des Rendez-vous</h1>
+                <p class="mb-0 opacity-75">Gérez tous les rendez-vous des patients en un seul endroit</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light btn-modern fw-bold" data-bs-toggle="modal" data-bs-target="#addRendezVousModal">
+                    <i class="bi bi-calendar-plus me-2"></i>Nouveau Rendez-vous
+                </button>
+            </div>
         </div>
+    </div>
 
-        <!-- Statistiques rendez-vous -->
-        <div class="row g-4 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="card-modern text-center p-4">
-                    <div class="section-title mb-1">Total</div>
-                    <div style="font-size:2rem;font-weight:700;">{{ $totalRendezVous ?? '0' }}</div>
-                    <div class="text-muted">Rendez-vous</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card-modern text-center p-4">
-                    <div class="section-title mb-1">À venir</div>
-                    <div style="font-size:2rem;font-weight:700;">{{ $upcomingCount ?? '0' }}</div>
-                    <div class="text-muted">à venir</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card-modern text-center p-4">
-                    <div class="section-title mb-1">Terminés</div>
-                    <div style="font-size:2rem;font-weight:700;">{{ $completedCount ?? '0' }}</div>
-                    <div class="text-muted">effectués</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card-modern text-center p-4">
-                    <div class="section-title mb-1">Annulés</div>
-                    <div style="font-size:2rem;font-weight:700;">{{ $cancelledCount ?? '0' }}</div>
-                    <div class="text-muted">annulés</div>
-                </div>
+    <!-- Cartes de statistiques -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-number text-primary">{{ $stats['total'] }}</div>
+            <div class="stat-label">Total Rendez-vous</div>
+        </div>
+        <div class="stat-card a-venir">
+            <div class="stat-number text-info">{{ $stats['a_venir'] }}</div>
+            <div class="stat-label">À Venir</div>
+        </div>
+        <div class="stat-card termines">
+            <div class="stat-number text-success">{{ $stats['termines'] }}</div>
+            <div class="stat-label">Terminés</div>
+        </div>
+        <div class="stat-card annules">
+            <div class="stat-number text-danger">{{ $stats['annules'] }}</div>
+            <div class="stat-label">Annulés</div>
+        </div>
+    </div>
+
+    <!-- Messages d'alerte -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <!-- Tableau des rendez-vous -->
+    <div class="card card-modern">
+        <div class="card-header card-header-modern">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="section-title mb-0">
+                    <i class="bi bi-calendar-week me-2"></i>Tous les Rendez-vous
+                </h5>
+                <span class="badge bg-primary">{{ $rendezvous->count() }} rendez-vous</span>
             </div>
         </div>
-
-        <!-- Liste des rendez-vous -->
-        <div class="card-modern mb-4">
-            <div class="card-header bg-white border-0 pb-0">
-                <div class="section-title">Tous les rendez-vous</div>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-modern mb-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern">
                     <thead>
                         <tr>
                             <th>Patient</th>
-                            <th>Date</th>
-                            <th>Heure</th>
+                            <th>APS</th>
+                            <th>Date & Heure</th>
                             <th>Type</th>
+                            <th>Durée</th>
                             <th>Statut</th>
-                            <th></th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                    @forelse($rendezVousList as $rdv)
+                        @forelse($rendezvous as $rdv)
                         <tr>
                             <td>
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($rdv->patient->nom ?? 'Patient') }}&background=e83e8c&color=fff&size=32" class="rounded-circle me-2" style="width:32px;"> {{ $rdv->patient->nom ?? 'Patient' }}
+                                <div class="d-flex align-items-center">
+                                    <div class="patient-avatar me-3">
+                                        {{ substr($rdv->patient->prenom, 0, 1) }}{{ substr($rdv->patient->nom, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ $rdv->patient->prenom }} {{ $rdv->patient->nom }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ $rdv->patient->telephone }}</small>
+                                    </div>
+                                </div>
                             </td>
-                            <td>{{ $rdv->date ?? '-' }}</td>
-                            <td>{{ $rdv->heure ?? '-' }}</td>
-                            <td><span class="badge bg-primary">{{ $rdv->type ?? 'Consultation' }}</span></td>
                             <td>
-                                @if($rdv->statut === 'à venir')
-                                    <span class="badge-status badge-success">À venir</span>
-                                @elseif($rdv->statut === 'terminé')
-                                    <span class="badge-status badge-info">Terminé</span>
-                                @elseif($rdv->statut === 'annulé')
-                                    <span class="badge-status badge-danger">Annulé</span>
-                                @else
-                                    <span class="badge-status badge-warning">Inconnu</span>
-                                @endif
+                                <strong>{{ $rdv->aps->nom ?? 'N/A' }}</strong>
                             </td>
-                            <td><a href="#" class="btn btn-sm btn-outline-secondary">Détails</a></td>
+                            <td>
+                                <strong>{{ \Carbon\Carbon::parse($rdv->date_heure)->format('d/m/Y') }}</strong>
+                                <br>
+                                <small class="text-muted">{{ \Carbon\Carbon::parse($rdv->date_heure)->format('H:i') }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">{{ $rdv->type_rendezvous }}</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ $rdv->duree }} min</span>
+                            </td>
+                            <td>
+                                <span class="badge-status badge-{{ str_replace('é', 'e', $rdv->statut) }}">
+                                    {{ $rdv->statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <!-- Modifier le statut -->
+                                    <select class="status-select" onchange="updateStatus({{ $rdv->id }}, this.value)">
+                                        <option value="en_attente" {{ $rdv->statut == 'en_attente' ? 'selected' : '' }}>En attente</option>
+                                        <option value="confirmé" {{ $rdv->statut == 'confirmé' ? 'selected' : '' }}>Confirmé</option>
+                                        <option value="terminé" {{ $rdv->statut == 'terminé' ? 'selected' : '' }}>Terminé</option>
+                                        <option value="annulé" {{ $rdv->statut == 'annulé' ? 'selected' : '' }}>Annulé</option>
+                                    </select>
+
+                                    <!-- Éditer -->
+                                    <button class="btn btn-warning btn-action" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editRendezVousModal{{ $rdv->id }}"
+                                            title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <!-- Supprimer -->
+                                    <form action="{{ route('aps.rendezvous.destroy', $rdv->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-action" 
+                                                onclick="return confirm('Supprimer ce rendez-vous ?')"
+                                                title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
-                    @empty
-                        <tr><td colspan="6" class="text-center text-muted">Aucun rendez-vous trouvé</td></tr>
-                    @endforelse
+
+                        <!-- Modal d'édition -->
+                        <div class="modal fade modal-modern" id="editRendezVousModal{{ $rdv->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Modifier le Rendez-vous</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ route('aps.rendezvous.update', $rdv->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Patient *</label>
+                                                    <select name="patient_id" class="form-control form-control-modern" required>
+                                                        @foreach($patients as $patient)
+                                                            <option value="{{ $patient->id }}" {{ $rdv->patient_id == $patient->id ? 'selected' : '' }}>
+                                                                {{ $patient->prenom }} {{ $patient->nom }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">APS *</label>
+                                                    <select name="aps_id" class="form-control form-control-modern" required>
+                                                        @foreach($apss as $aps)
+                                                            <option value="{{ $aps->id }}" {{ $rdv->aps_id == $aps->id ? 'selected' : '' }}>
+                                                                {{ $aps->nom }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Date *</label>
+                                                    <input type="date" name="date_heure" class="form-control form-control-modern" 
+                                                           value="{{ \Carbon\Carbon::parse($rdv->date_heure)->format('Y-m-d') }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Heure *</label>
+                                                    <input type="time" name="heure" class="form-control form-control-modern" 
+                                                           value="{{ \Carbon\Carbon::parse($rdv->date_heure)->format('H:i') }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Type *</label>
+                                                    <select name="type_rendezvous" class="form-control form-control-modern" required>
+                                                        <option value="Consultation" {{ $rdv->type_rendezvous == 'Consultation' ? 'selected' : '' }}>Consultation</option>
+                                                        <option value="Suivi" {{ $rdv->type_rendezvous == 'Suivi' ? 'selected' : '' }}>Suivi</option>
+                                                        <option value="Vaccination" {{ $rdv->type_rendezvous == 'Vaccination' ? 'selected' : '' }}>Vaccination</option>
+                                                        <option value="Examen" {{ $rdv->type_rendezvous == 'Examen' ? 'selected' : '' }}>Examen</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Durée (minutes) *</label>
+                                                    <input type="number" name="duree" class="form-control form-control-modern" 
+                                                           value="{{ $rdv->duree }}" min="5" max="240" required>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Motif *</label>
+                                                    <textarea name="motif" class="form-control form-control-modern" rows="3" required>{{ $rdv->motif }}</textarea>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Statut *</label>
+                                                    <select name="statut" class="form-control form-control-modern" required>
+                                                        <option value="en_attente" {{ $rdv->statut == 'en_attente' ? 'selected' : '' }}>En attente</option>
+                                                        <option value="confirmé" {{ $rdv->statut == 'confirmé' ? 'selected' : '' }}>Confirmé</option>
+                                                        <option value="terminé" {{ $rdv->statut == 'terminé' ? 'selected' : '' }}>Terminé</option>
+                                                        <option value="annulé" {{ $rdv->statut == 'annulé' ? 'selected' : '' }}>Annulé</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-primary-modern btn-modern">Mettre à jour</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+                                <h5 class="text-muted">Aucun rendez-vous trouvé</h5>
+                                <p class="text-muted">Commencez par créer votre premier rendez-vous</p>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <!-- Activité récente -->
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="card-modern p-4 h-100">
-                    <div class="section-title mb-3">Activité récente</div>
-                    <div class="activity-feed">
-                        @forelse($recentActivities as $activity)
-                            <div class="activity-item">
-                                <span class="icon" style="color: var(--main-accent);"><i class="bi bi-{{ $activity->icon ?? 'info-circle' }}"></i></span>
-                                <div>
-                                    <div class="desc">{!! $activity->description !!}</div>
-                                    <div class="time">{{ $activity->created_at->diffForHumans() }}</div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center text-muted">Aucune activité récente</div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card-modern p-4 h-100">
-                    <div class="section-title mb-3">Statistiques avancées</div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex align-items-center justify-content-between">
-                            <span><i class="bi bi-clock-history me-2" style="color: var(--main-blue);"></i>Durée moyenne consultation</span>
-                            <span class="fw-bold">{{ $avgDuration ?? '—' }} min</span>
-                        </li>
-                        <li class="list-group-item d-flex align-items-center justify-content-between">
-                            <span><i class="bi bi-bar-chart-line me-2" style="color: var(--main-green);"></i>Taux d'annulation</span>
-                            <span class="fw-bold">{{ $cancelRate ?? '—' }}%</span>
-                        </li>
-                        <li class="list-group-item d-flex align-items-center justify-content-between">
-                            <span><i class="bi bi-emoji-smile me-2" style="color: var(--main-yellow);"></i>Satisfaction patients</span>
-                            <span class="fw-bold">{{ $satisfaction ?? '—' }}%</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-<div class="container-fluid py-4" style="background:var(--main-bg); min-height:90vh;">
-    <div class="form-header mb-4">
-        <h1>Nouveau rendez-vous</h1>
     </div>
+</div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card-modern p-5">
-                <form action="" method="POST">
-                    @csrf
-                    <div class="row g-4 mb-4">
+<!-- Modal d'ajout -->
+<div class="modal fade modal-modern" id="addRendezVousModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouveau Rendez-vous</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('aps.rendezvous.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="patient_nom" class="form-label">Nom du patient</label>
-                            <input type="text" class="form-control" id="patient_nom" name="patient_nom" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="patient_prenom" class="form-label">Prénom du patient</label>
-                            <input type="text" class="form-control" id="patient_prenom" name="patient_prenom">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="date" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="date" name="date" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="heure" class="form-label">Heure</label>
-                            <input type="time" class="form-control" id="heure" name="heure" required>
-                        </div>
-                        <div class="col-md-12">
-                            <label for="type" class="form-label">Type de rendez-vous</label>
-                            <select class="form-select" id="type" name="type" required>
-                                <option selected disabled>Choisir un type...</option>
-                                <option>Consultation</option>
-                                <option>Suivi</option>
-                                <option>Vaccination</option>
-                                <option>Examen</option>
+                            <label class="form-label">Patient *</label>
+                            <select name="patient_id" class="form-control form-control-modern" required>
+                                <option value="">Sélectionnez un patient</option>
+                                @foreach($patients as $patient)
+                                    <option value="{{ $patient->id }}">
+                                        {{ $patient->prenom }} {{ $patient->nom }} - {{ $patient->telephone }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
-                        <div class="col-md-12">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        <div class="col-md-6">
+                            <label class="form-label">APS *</label>
+                            <select name="aps_id" class="form-control form-control-modern" required>
+                                <option value="">Sélectionnez un APS</option>
+                                @foreach($apss as $aps)
+                                    <option value="{{ $aps->id }}">{{ $aps->nom }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date *</label>
+                            <input type="date" name="date_heure" class="form-control form-control-modern" 
+                                   min="{{ date('Y-m-d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Heure *</label>
+                            <input type="time" name="heure" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Type de rendez-vous *</label>
+                            <select name="type_rendezvous" class="form-control form-control-modern" required>
+                                <option value="">Sélectionnez un type</option>
+                                <option value="Consultation">Consultation</option>
+                                <option value="Suivi">Suivi</option>
+                                <option value="Vaccination">Vaccination</option>
+                                <option value="Examen">Examen</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Durée (minutes) *</label>
+                            <input type="number" name="duree" class="form-control form-control-modern" 
+                                   value="30" min="5" max="240" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Motif *</label>
+                            <textarea name="motif" class="form-control form-control-modern" rows="3" 
+                                      placeholder="Décrivez le motif de la consultation..." required></textarea>
                         </div>
                     </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-submit py-3">
-                            <i class="bi bi-calendar-plus me-2"></i> Ajouter le rendez-vous
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary-modern btn-modern">
+                        <i class="bi bi-calendar-plus me-2"></i>Créer le Rendez-vous
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-        </div>
 
-        <div class="text-center text-muted mt-4" style="font-size:0.95rem;">
-            &copy; {{ date('Y') }} Pvvih - Rendez-vous Médecin. Design par GitHub Copilot.
-        </div>
+<script>
+function updateStatus(rendezvousId, newStatus) {
+    if (confirm('Êtes-vous sûr de vouloir modifier le statut de ce rendez-vous ?')) {
+        fetch(`/rendezvous/${rendezvousId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ statut: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
 
-    </div>
-    @endsection
+// Combiner date et heure pour l'envoi au serveur
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const dateInput = this.querySelector('input[name="date_heure"]');
+            const timeInput = this.querySelector('input[name="heure"]');
+            
+            if (dateInput && timeInput) {
+                const dateTime = `${dateInput.value} ${timeInput.value}:00`;
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'date_heure';
+                hiddenInput.value = dateTime;
+                this.appendChild(hiddenInput);
+            }
+        });
+    });
+});
+</script>
+@endsection

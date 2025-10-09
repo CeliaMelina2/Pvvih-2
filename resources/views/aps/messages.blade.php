@@ -171,7 +171,7 @@
 <div class="container-fluid py-4" style="background:var(--main-bg); min-height:90vh;">
     <div class="messages-header mb-4 d-flex justify-content-between align-items-center">
         <h1>Messagerie</h1>
-        <a href="{{ route('aps.messages') }}" class="btn btn-primary-add px-4">
+        <a href="" class="btn btn-primary-add px-4">
             <i class="bi bi-chat-dots me-2"></i>Nouveau message
         </a>
     </div>
